@@ -2,50 +2,44 @@ var $ = function (selector) {
     var elements = [];
 
     /*
-    Search for tags
-    Check if there are . or # in the selector, indexOf returns -1 if the value is not found in the selector
+    Search for tags - Check if there are . or # in the selector, indexOf returns -1 if the value is not found in the selector
     If there are no . or # in the selector we are searching for a tag
     Search for the element, convert the HTML collection returned to an array so we can iterate over it
     Finally push the result to the elements array 
     */
     if (selector.indexOf(".") == -1 && selector.indexOf("#") == -1) {
-        var foundTags = toArray(document.getElementsByTagName(selector))
-        foundTags.forEach(e => {
+        searchTag(selector).forEach(e => {
             elements.push(e)
         })
     }
 
+
     /*
-    Search for an id
-    Check if there is a # in the first position of the selector
+    Search for an id - Check if there is a # in the first position of the selector
     If there is a # in the first position we are searching for an id
     Split the selector string to get the name of the id we are searching for
     Finally get the element we are searching for and push the result to the elements array 
     */
     if (selector.indexOf("#") == 0) {
-        var idSelector = selector.split("#")[1];
-        elements.push(document.getElementById(idSelector));
+        elements.push(searchId(selector.split("#")[1]));
     }
 
+
     /*
-    Search for a class
-    Checking if there is a . in the first position of the selector
+    Search for a class - Checking if there is a . in the first position of the selector
     If there is a . in the first position we are searching for a class
     Split the selector string to get the name of the class we are searching for
     Get the elements we are searching for, convert the HTML collection returned to an array so we can iterate over it
     Finally push the result to the elements array 
     */
     if (selector.indexOf(".") == 0) {
-        var classSelector = selector.split(".")[1]
-        var foundClasses = toArray(document.getElementsByClassName(classSelector));
-        foundClasses.forEach(e => {
+        searchClass(selector.split(".")[1]).forEach(e => {
             elements.push(e);
         })
     }
 
-    /*
-    Multiple selector Tag, id and class
-    */
+
+    //Multiple selector tag, id and class
     if (selector.indexOf("#") > 0 || selector.indexOf(".") > 0) {
         //Get the position of the # and . on the selector so we can compare them and look for a class or id first
         var sharp = selector.indexOf("#");
@@ -71,22 +65,16 @@ var $ = function (selector) {
             }
         }
 
-        //Search for the elements, convert the HTML collections to arrays
-        var foundTags = toArray(document.getElementsByTagName(tag));
-        var foundId = [document.getElementById(id)];
-        var foundClasses = toArray(document.getElementsByClassName(klass));
+        //Search for the elements
+        var foundTags = searchTag(tag);
+        var foundId = [searchId(id)];
+        var foundClasses = searchClass(klass);
 
         //Finally push the result to the elements array
         foundTags.forEach(e => {
-            if (!id) {
-                elements.push(e)
-            }
-            if (!klass) {
-                elements.push(e)
-            }
-            if (foundClasses.includes(e) && foundId.includes(e)) {
-                elements.push(e)
-            }
+            if (!id) elements.push(e);
+            if (!klass) elements.push(e);
+            if (foundClasses.includes(e) && foundId.includes(e)) elements.push(e);
         })
     }
     return elements;
@@ -94,5 +82,20 @@ var $ = function (selector) {
 
 //Creates an array from an HTML collection so we can iterate over it
 var toArray = function (element) {
-    return Array.from(element)
+    return Array.from(element);
+}
+
+//Search for the tag, convert the HTML collection returned to an array so we can iterate over it
+var searchTag = function (selector) {
+    return toArray(document.getElementsByTagName(selector));
+}
+
+//Search for the id
+var searchId = function (selector) {
+    return document.getElementById(selector);
+}
+
+//Search for the class, convert the HTML collection returned to an array so we can iterate over it
+var searchClass = function (selector) {
+    return toArray(document.getElementsByClassName(selector));
 }
